@@ -1,0 +1,1 @@
+kubectl apply -f manifests/autoscale.yaml -n kserve-test
