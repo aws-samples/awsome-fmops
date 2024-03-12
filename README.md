@@ -5,19 +5,29 @@ KServe offers a standard Kubernetes-based Model Inference Platform for scalable 
 All the infrastructure will be constructed through Terraform.
 In addition to the infrastructure this repository contains tutorials utilizing different compute (CPU/GPU/Inferentia) in `tutorials` directory.
 
-* Kaprenter autoscaling
-* KServe inference example
-* Benchmarking KServe Inference service
-
 ## Pre-requisites
 The following tools are required to work with this repository:
 * make
 * aws-cli
 * terraform
-* kubectl
 
-`make` comamnd can be downloaded from https://www.gnu.org/software/make/ or package manager of your choice.
-You can install the rest of the tools with `make install-awscli` , `make install-terraform`, `make install-kubectl`.
+`make` command can be downloaded from https://www.gnu.org/software/make/ or package manager of your choice.
+You can install the rest of the tools with `make install-awscli` , `make install-terraform`
+
+
+* kubectl
+, `make install-kubectl`.
+
+
+## Clean up infrastructure
+
+Once you finished your experiments, you can remove all the infrastructures by:
+* Remove all pods/services created for tutorials (please refer "clean up" section of each tutorial for details).
+* Destroy the infrastructure with:
+
+```bash
+make destory
+```
 
 
 ## Security
