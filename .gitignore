@@ -272,3 +272,4 @@ terraform.rc
 .kube
 kubeflow-manifests
 .terraform.lock.hcl
+karpenter-blueprints
