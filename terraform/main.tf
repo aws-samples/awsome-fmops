@@ -83,3 +83,11 @@ data "http" "k8s-neuron-device-plugin-rbac-yml" {
 resource "kubectl_manifest" "k8s-neuron-device-plugin-rbac" {
   yaml_body = data.http.k8s-neuron-device-plugin-rbac-yml.response_body
 }
+
+resource "kubectl_manifest" "gpu-default-nodepool" {
+    yaml_body = file("nodepools/gpu.yaml")
+}
+
+resource "kubectl_manifest" "neuron-default-nodepool" {
+    yaml_body = file("nodepools/neuron.yaml")
+}

@@ -1,0 +1,27 @@
+
+---
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
+metadata:
+  name: neuron
+  annotations:
+    kubernetes.io/description: "General purpose NodePool for Neuron generic workloads"
+spec:
+  template:
+    spec:
+      requirements:
+        - key: karpenter.k8s.aws/instance-family
+          operator: In
+          values: ["inf2", "trn1", "trn1n"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+      nodeClassRef:
+        name: "default"
+      taints:
+        - key: nvidia.com/gpu
+          value: "true"
+          effect: "NoSchedule"
