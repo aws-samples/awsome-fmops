@@ -7,7 +7,7 @@ data "aws_eks_cluster" "cluster" {
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = "karpenter-blueprints"  # Replace with your EKS cluster name
+  name = "karpenter-blueprints" 
 }
 
 provider "helm" {
@@ -61,7 +61,7 @@ resource "helm_release" "kserve" {
 
 resource "helm_release" "nvidia-divice-plugin" {
   name       = "nvdp"
-  namespace = "nvidia-device-plugin"
+  namespace = "kube-system"
   create_namespace = true
   repository = "https://nvidia.github.io/k8s-device-plugin"
   chart      = "nvidia-device-plugin"
