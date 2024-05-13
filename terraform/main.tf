@@ -67,3 +67,19 @@ resource "helm_release" "nvidia-divice-plugin" {
   chart      = "nvidia-device-plugin"
   version = "0.15.0"
 }
+
+data "http" "k8s-neuron-device-plugin-yml" {
+  url = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin.yml"
+}
+
+resource "kubectl_manifest" "k8s-neuron-device-plugin" {
+  yaml_body = data.http.k8s-neuron-device-plugin-yml.response_body
+}
+
+data "http" "k8s-neuron-device-plugin-rbac-yml" {
+  url = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin.yml"
+}
+
+resource "kubectl_manifest" "k8s-neuron-device-plugin-rbac" {
+  yaml_body = data.http.k8s-neuron-device-plugin-rbac-yml.response_body
+}
