@@ -58,3 +58,12 @@ resource "helm_release" "kserve" {
   depends_on = [helm_release.cert-manager]
 
 }
+
+resource "helm_release" "nvidia-divice-plugin" {
+  name       = "nvdp"
+  namespace = "nvidia-device-plugin"
+  create_namespace = true
+  repository = "https://nvidia.github.io/k8s-device-plugin"
+  chart      = "nvidia-device-plugin"
+  version = "0.15.0"
+}
