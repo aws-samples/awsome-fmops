@@ -34,13 +34,6 @@ module "eks_data_addons" {
   enable_aws_neuron_device_plugin = true
 }
 
-resource "helm_release" "kserve_crd" {
-  name       = "kserve-crd"
-  repository = "oci://ghcr.io/kserve/charts"
-  chart      = "kserve-crd"
-  version    = "v0.12.0"
-}
-
 resource "helm_release" "cert-manager" {
   name             = "cert-manager"
   namespace        = "cert-manager"
@@ -53,6 +46,48 @@ resource "helm_release" "cert-manager" {
     name  = "installCRDs"
     value = "true"
   }
+}
+
+resource "helm_release" "istio-base" {
+  name             = "istio-base"
+  namespace        = "istio-system"
+  create_namespace = true
+  repository       = "https://istio-release.storage.googleapis.com/charts"
+  chart            = "base"
+  version          = "1.20.4"
+  timeout          = 600
+  set {
+    name  = "defaultRevision"
+    value = "default"
+  }
+}
+
+resource "helm_release" "istiod" {
+  name             = "istiod"
+  namespace        = "istio-system"
+  repository       = "https://istio-release.storage.googleapis.com/charts"
+  chart            = "istiod"
+  version          = "1.20.4"
+  timeout          = 600
+  depends_on = [helm_release.istio-base]
+}
+
+resource "helm_release" "istio-ingress" {
+  name             = "istio-ingress"
+  namespace        = "istio-ingress"
+  create_namespace = true
+  repository       = "https://istio-release.storage.googleapis.com/charts"
+  chart            = "gateway"
+  version          = "1.20.4"
+  timeout          = 600
+  depends_on = [helm_release.istiod]
+}
+
+resource "helm_release" "kserve_crd" {
+  name       = "kserve-crd"
+  repository = "oci://ghcr.io/kserve/charts"
+  chart      = "kserve-crd"
+  version    = "v0.12.0"
 }
 
 resource "helm_release" "kserve" {
