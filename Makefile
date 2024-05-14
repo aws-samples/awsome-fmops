@@ -24,7 +24,7 @@ destroy:
 	&& kubectl delete --all ec2nodeclass \
 	&& terraform destroy --auto-approve \
 	&& popd \
-	cd karpenter-blueprints/cluster/terraform \
+	&& cd karpenter-blueprints/cluster/terraform \
 	&& terraform destroy -target="module.eks_blueprints_addons" --auto-approve \
 	&& terraform destroy -target="module.eks" --auto-approve \
 	&& terraform destroy --auto-approve
