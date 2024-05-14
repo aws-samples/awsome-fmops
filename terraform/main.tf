@@ -7,7 +7,7 @@ data "aws_eks_cluster" "cluster" {
 }
 
 data "aws_eks_cluster_auth" "cluster" {
-  name = "karpenter-blueprints" 
+  name = "karpenter-blueprints"
 }
 
 provider "helm" {
@@ -26,6 +26,14 @@ provider "kubectl" {
   token                  = data.aws_eks_cluster_auth.cluster.token
 }
 
+module "eks_data_addons" {
+  source                          = "aws-ia/eks-data-addons/aws"
+  version                         = "~> 1.0" # ensure to update this to the latest/desired version
+  oidc_provider_arn               = data.aws_eks_cluster.cluster.identity.0.oidc.0.issuer
+  enable_nvidia_device_plugin     = true
+  enable_aws_neuron_device_plugin = true
+}
+
 resource "helm_release" "kserve_crd" {
   name       = "kserve-crd"
   repository = "oci://ghcr.io/kserve/charts"
@@ -34,13 +42,13 @@ resource "helm_release" "kserve_crd" {
 }
 
 resource "helm_release" "cert-manager" {
-  name       = "cert-manager"
-  namespace = "cert-manager"
+  name             = "cert-manager"
+  namespace        = "cert-manager"
   create_namespace = true
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = "v1.14.5"
-  timeout = 600
+  repository       = "https://charts.jetstack.io"
+  chart            = "cert-manager"
+  version          = "v1.14.5"
+  timeout          = 600
   set {
     name  = "installCRDs"
     value = "true"
@@ -48,46 +56,29 @@ resource "helm_release" "cert-manager" {
 }
 
 resource "helm_release" "kserve" {
-  name       = "kserve"
-  namespace = "kserve"
+  name             = "kserve"
+  namespace        = "kserve"
   create_namespace = true
-  repository = "oci://ghcr.io/kserve/charts"
-  chart      = "kserve"
-  version = "v0.12.0"
+  repository       = "oci://ghcr.io/kserve/charts"
+  chart            = "kserve"
+  version          = "v0.12.0"
 
   depends_on = [helm_release.cert-manager]
 
 }
 
-resource "helm_release" "nvidia-divice-plugin" {
-  name       = "nvdp"
-  namespace = "kube-system"
-  create_namespace = true
-  repository = "https://nvidia.github.io/k8s-device-plugin"
-  chart      = "nvidia-device-plugin"
-  version = "0.15.0"
-}
-
-data "http" "k8s-neuron-device-plugin-yml" {
-  url = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin.yml"
-}
-
-resource "kubectl_manifest" "k8s-neuron-device-plugin" {
-  yaml_body = data.http.k8s-neuron-device-plugin-yml.response_body
-}
-
-data "http" "k8s-neuron-device-plugin-rbac-yml" {
-  url = "https://raw.githubusercontent.com/aws-neuron/aws-neuron-sdk/master/src/k8/k8s-neuron-device-plugin.yml"
-}
-
-resource "kubectl_manifest" "k8s-neuron-device-plugin-rbac" {
-  yaml_body = data.http.k8s-neuron-device-plugin-rbac-yml.response_body
-}
-
 resource "kubectl_manifest" "gpu-default-nodepool" {
-    yaml_body = file("nodepools/gpu.yaml")
+  yaml_body = file("nodepools/gpu-nodepool.yaml")
+}
+
+resource "kubectl_manifest" "gpu-default-nodeclass" {
+  yaml_body = file("nodepools/gpu-nodeclass.yaml")
 }
 
 resource "kubectl_manifest" "neuron-default-nodepool" {
-    yaml_body = file("nodepools/neuron.yaml")
+  yaml_body = file("nodepools/neuron-nodepool.yaml")
+}
+
+resource "kubectl_manifest" "neuron-default-nodeclass" {
+  yaml_body = file("nodepools/neuron-nodeclass.yaml")
 }

@@ -1,0 +1,21 @@
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  name: al2-gpu
+  annotations:
+    kubernetes.io/description: "EC2NodeClass for running GPU nodes"
+spec:
+  amiFamily: AL2
+  role: "karpenter-karpenter-blueprints" 
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "karpenter-blueprints"
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "karpenter-blueprints" 
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeType: gp3
+        volumeSize: 128Gi
+        deleteOnTermination: true
