@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: nvidia-smi
+spec:
+  template:
+    spec:
+      containers:
+      - name: nvidia-smi
+        image: nvcr.io/nvidia/cuda:12.4.1-cudnn-devel-ubuntu22.04
+        command: ["nvidia-smi"]
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+      tolerations:
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
+      restartPolicy: Never
+  backoffLimit: 4
