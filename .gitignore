@@ -273,3 +273,4 @@ terraform.rc
 kubeflow-manifests
 .terraform.lock.hcl
 karpenter-blueprints
+istio-*

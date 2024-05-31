@@ -1,8 +1,8 @@
 SHELL := /bin/bash
 export TF_VAR_region := us-west-2
 
-all: build
-build:
+all: deploy
+deploy:
 	@echo "Building the infrastructure"
 	[ -d karpenter-blueprints ] || git clone https://github.com/aws-samples/karpenter-blueprints \
 	&& pushd karpenter-blueprints/cluster/terraform \
@@ -16,6 +16,10 @@ build:
 	&& cd terraform \
 	&& terraform init \
 	&& terraform apply --auto-approve
+    && kubectl apply --filename https://github.com/knative/serving/releases/download/knative-v1.13.1/serving-crds.yaml \
+    && kubectl apply --filename https://github.com/knative/serving/releases/download/knative-v1.13.1/serving-core.yaml \
+    && kubectl apply --filename https://github.com/knative/net-istio/releases/download/knative-v1.13.1/release.yaml  \
+	&& kubectl patch cm config-domain --patch '{"data":{"example.com":""}}' -n knative-serving
 destroy:
 	@echo "Destroying the infrastructure"
 	pushd terraform \
