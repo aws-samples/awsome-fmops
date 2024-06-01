@@ -2,8 +2,9 @@
 
 This repository contains reference architectures and test cases for Foundation Model Operations (FMOps) on [Amazon EKS](https://aws.amazon.com/eks). 
 
-Foundation Model Operations (FMOps) encompass the end-to-end processes involved in managing foundation models, from initial pretraining to deployment and monitoring. This repository is designed to showcase usage of different frameworks at each stage of the life stage of foundation model and end to end pipeline. Specifically, FMOps in this repository involving the following four stages, (continuos) pretraining, finetuning, evaluation, and deployment. The following section "Stages of Foundation Model Operations" elavorate each stage. Each subdirectory of this repository ([pretraining](./pretraining), [finetuning](./finetuning/), [evaluation](./evaluation), [deployment](./deployment/)) including test cases for each stage.
-Our infrastructure is deployed using [Terraform](https://www.terraform.io/). Please refer to the [deployment guide](./infra/README.md) for infrustrucuter setup guide.
+Foundation Model Operations (FMOps) encompass the end-to-end processes involved in managing foundation models, from initial pretraining to deployment and monitoring. This repository is designed to showcase the usage of different frameworks at each stage of the foundation model lifecycle and the end-to-end pipeline. Specifically, FMOps in this repository involve the following four stages: continuous pretraining, finetuning, evaluation, and deployment. The following section, "Stages of Foundation Model Operations," elaborates on each stage. Each subdirectory of this repository ([pretraining](./pretraining), [finetuning](./finetuning), [evaluation](./evaluation), [deployment](./deployment)) includes test cases for each stage.
+
+Our infrastructure is deployed using [Terraform](https://www.terraform.io/). Please refer to the [deployment guide](./infra/README.md) for the infrastructure setup guide.
 
 ### Stages of Foundation Model Operations
 
@@ -20,8 +21,7 @@ __2. Finetuning__  involves adapting the pretrained foundation model to specific
 
 __3. Evaluation__  is a critical stage that occurs after both pretraining and finetuning. It involves assessing the model's performance using standardized benchmarks and metrics. Evaluation helps track the model's progress, identify areas for improvement, and ensure that the model meets the desired performance criteria. 
 
-__4. Deployment__
-Deployment is the final stage, where the foundation model is integrated into production environments. This stage includes:
+__4. Deployment__  is the final stage, where the foundation model is integrated into production environments. This stage includes:
 * __Serving__: Making the model available for use in real-world applications, ensuring it can handle the required load and provide timely responses.
 * __Monitoring__: Continuously tracking the model's performance and behavior in production to detect and address any issues, such as performance degradation or unexpected outputs. Monitoring also involves updating the model as needed to maintain its effectiveness and relevance.
 
