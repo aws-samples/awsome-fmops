@@ -93,6 +93,7 @@ module "eks" {
   create_node_security_group               = false
   authentication_mode                      = "API_AND_CONFIG_MAP"
   enable_cluster_creator_admin_permissions = true
+  enable_efa_support                  = true
 
   eks_managed_node_groups = {
     mg_5 = {
@@ -132,7 +133,6 @@ module "eks_blueprints_addons" {
 
   create_delay_dependencies = [for prof in module.eks.eks_managed_node_groups : prof.node_group_arn]
 
-  enable_efa_support                  = true
   enable_aws_load_balancer_controller = true
   enable_metrics_server               = true
 
@@ -245,7 +245,7 @@ module "vpc" {
 module "eks_data_addons" {
   source                          = "aws-ia/eks-data-addons/aws"
   version                         = "~> 1.0" # ensure to update this to the latest/desired version
-  oidc_provider_arn               = module.eks.cluster.identity.0.oidc.0.issuer
+  oidc_provider_arn               = module.eks.oidc_provider_arn
   enable_nvidia_device_plugin     = true
   enable_aws_neuron_device_plugin = true
 }
