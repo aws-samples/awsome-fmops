@@ -250,6 +250,17 @@ module "eks_data_addons" {
   enable_aws_neuron_device_plugin = true
 }
 
+resource "aws_ecr_repository" "awsome-fmops" {
+  name                 = "awsome-fmops"
+  image_tag_mutability = "MUTABLE"
+  force_delete         = true
+
+  image_scanning_configuration {
+    scan_on_push = false
+  }
+}
+
+
 resource "kubectl_manifest" "gpu-default-nodepool" {
   yaml_body = file("nodepools/gpu-nodepool.yaml")
 }
@@ -266,12 +277,13 @@ resource "kubectl_manifest" "neuron-default-nodeclass" {
   yaml_body = file("nodepools/neuron-nodeclass.yaml")
 }
 
-resource "aws_ecr_repository" "awsome-fmops" {
-  name                 = "awsome-fmops"
-  image_tag_mutability = "MUTABLE"
-  force_delete         = true
-
-  image_scanning_configuration {
-    scan_on_push = false
-  }
+resource "helm_release" "kube-prometheus-stack" {
+  name       = "prometheus"
+  create_namespace = true
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "kube-prometheus-stack"
+  namespace  = "prometheus"
+  values = [
+    file("helm-values/kube-prometheus-stack-values.yaml")
+  ]
 }
