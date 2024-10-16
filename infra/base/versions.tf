@@ -1,5 +1,10 @@
 terraform {
   required_version = ">= 1.0.0"
+  backend "s3" {
+    bucket = "awsome-fmops-483026362307"
+    key = "terraform"
+    region = "us-east-1"
+  }
 
   required_providers {
     aws = {
