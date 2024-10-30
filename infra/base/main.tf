@@ -42,7 +42,7 @@ data "aws_ecrpublic_authorization_token" "token" {
 data "aws_availability_zones" "available" {}
 
 locals {
-  name            = "karpenter-blueprints"
+  name            = "awsome-fmops"
   cluster_version = "1.29"
   region          = var.region
   node_group_name = "managed-ondemand"
@@ -114,6 +114,282 @@ module "eks" {
       labels = {
         intent = "control-apps"
       }
+    }
+    gpu = {
+      node_group_name = "managed-p5"
+      instance_types = ["p5.48xlarge"]
+
+      create_security_group = false
+      subnet_ids   = [module.vpc.private_subnets[0]]
+      max_size = 4
+      desired_size = 4
+      min_size = 4
+      # Comment out this block to use on-demand instances without ODCR
+      capacity_reservation_specification = {
+        capacity_reservation_target = {
+          capacity_reservation_id = "cr-03d3df2e13babf2ae" 
+        }
+      }
+
+      network_interfaces = [
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 0
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 0
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 1
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 2
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 3
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 4
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 5
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 6
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 7
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 8
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 9
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 10
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 11
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 12
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 13
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 14
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 15
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 16
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 17
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 18
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 19
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 20
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 21
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 22
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 23
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 24
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 25
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 26
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 27
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 28
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 29
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 30
+        },
+        {
+          description                 = "EFA interface"
+          delete_on_termination       = true
+          device_index                = 1
+          associate_public_ip_address = false
+          interface_type              = "efa"
+          network_card_index          = 31
+        },
+
+      ]
     }
   }
 
@@ -261,29 +537,31 @@ resource "aws_ecr_repository" "awsome-fmops" {
 }
 
 
-resource "kubectl_manifest" "gpu-default-nodepool" {
-  yaml_body = file("nodepools/gpu-nodepool.yaml")
-}
+#resource "kubectl_manifest" "gpu-default-nodepool" {
+#  yaml_body = file("nodepools/gpu-nodepool.yaml")
+#}
+#
+#resource "kubectl_manifest" "gpu-default-nodeclass" {
+#  yaml_body = file("nodepools/gpu-nodeclass.yaml")
+#}
+#
+#resource "kubectl_manifest" "neuron-default-nodepool" {
+#  yaml_body = file("nodepools/neuron-nodepool.yaml")
+#}
+#
+#resource "kubectl_manifest" "neuron-default-nodeclass" {
+#  yaml_body = file("nodepools/neuron-nodeclass.yaml")
+#}
 
-resource "kubectl_manifest" "gpu-default-nodeclass" {
-  yaml_body = file("nodepools/gpu-nodeclass.yaml")
-}
-
-resource "kubectl_manifest" "neuron-default-nodepool" {
-  yaml_body = file("nodepools/neuron-nodepool.yaml")
-}
-
-resource "kubectl_manifest" "neuron-default-nodeclass" {
-  yaml_body = file("nodepools/neuron-nodeclass.yaml")
-}
-
-resource "helm_release" "kube-prometheus-stack" {
-  name       = "prometheus"
-  create_namespace = true
-  repository = "https://prometheus-community.github.io/helm-charts"
-  chart      = "kube-prometheus-stack"
-  namespace  = "prometheus"
-  values = [
-    file("helm-values/kube-prometheus-stack-values.yaml")
-  ]
-}
+#resource "helm_release" "kube-prometheus-stack" {
+#  name       = "prometheus"
+#  create_namespace = true
+#  repository = "https://prometheus-community.github.io/helm-charts"
+#  chart      = "kube-prometheus-stack"
+#  namespace  = "prometheus"
+#  values = [
+#    file("helm-values/kube-prometheus-stack-values.yaml")
+#  ]
+#  depends_on = [ module.eks ]
+#}
+#

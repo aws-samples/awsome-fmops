@@ -6,7 +6,7 @@ metadata:
     kubernetes.io/description: "EC2NodeClass for running GPU nodes"
 spec:
   amiFamily: AL2
-  role: "karpenter-karpenter-blueprints" 
+  role: "awsome-fmops" 
   subnetSelectorTerms:
     - tags:
         karpenter.sh/discovery: "karpenter-blueprints"
