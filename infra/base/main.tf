@@ -130,266 +130,44 @@ module "eks" {
           capacity_reservation_id = "cr-03d3df2e13babf2ae" 
         }
       }
+      ebs_optimized     = true
+      enable_monitoring = true
 
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 1024
+            volume_type           = "gp3"
+            iops                  = 3000
+            throughput            = 150
+            encrypted             = true
+            delete_on_termination = true
+          }
+        }
+      }
+      # The P Series can leverage EFA devices, below we attach EFA interfaces to all of the available slots to the instance
+      # we assign the host interface device_index=0, and all other interfaces device_index=1
+      #   p5.48xlarge has 32 network card indexes so the range should be 31, we'll create net interfaces 0-31
+      #   p4 instances have 4 network card indexes so the range should be 4, we'll create Net interfaces 0-3
       network_interfaces = [
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 0
+        for i in range(32) : {
           associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 0
-        },
-        {
-          description                 = "EFA interface"
           delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
+          device_index                = i == 0 ? 0 : 1
+          network_card_index          = i
           interface_type              = "efa"
-          network_card_index          = 1
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 2
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 3
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 4
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 5
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 6
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 7
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 8
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 9
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 10
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 11
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 12
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 13
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 14
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 15
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 16
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 17
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 18
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 19
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 20
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 21
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 22
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 23
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 24
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 25
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 26
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 27
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 28
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 29
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 30
-        },
-        {
-          description                 = "EFA interface"
-          delete_on_termination       = true
-          device_index                = 1
-          associate_public_ip_address = false
-          interface_type              = "efa"
-          network_card_index          = 31
-        },
-
+        }
       ]
+      # add `--local-disks raid0` to use the NVMe devices underneath the Pods, kubelet, containerd, and logs: https://github.com/awslabs/amazon-eks-ami/pull/1171
+      bootstrap_extra_args = "--local-disks raid0"
+      taints = {
+        gpu = {
+          key      = "nvidia.com/gpu"
+          effect   = "NO_SCHEDULE"
+          operator = "EXISTS"
+        }
+      }      
     }
   }
 
