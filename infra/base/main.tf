@@ -43,7 +43,7 @@ data "aws_availability_zones" "available" {}
 
 locals {
   name            = "awsome-fmops"
-  cluster_version = "1.29"
+  cluster_version = "1.3"
   region          = var.region
   node_group_name = "managed-ondemand"
 
