@@ -10,7 +10,7 @@ deploy:
 	&& kubectl patch cm config-domain --patch '{"data":{"example.com":""}}' -n knative-serving
 destroy:
 	@echo "Destroying the infrastructure"
-	&& kubectl delete --all nodeclaim \
+	kubectl delete --all nodeclaim \
 	&& kubectl delete --all nodepool \
 	&& kubectl delete --all ec2nodeclass \
 	&& terraform destroy -target="module.eks" --auto-approve \
