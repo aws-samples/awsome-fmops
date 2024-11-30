@@ -115,60 +115,6 @@ module "eks" {
         intent = "control-apps"
       }
     }
-    # gpu = {
-    #   node_group_name = "managed-p5"
-    #   instance_types = ["p5.48xlarge"]
-
-    #   create_security_group = false
-    #   subnet_ids   = [module.vpc.private_subnets[0]]
-    #   max_size = 4
-    #   desired_size = 4
-    #   min_size = 4
-    #   # Comment out this block to use on-demand instances without ODCR
-    #   capacity_reservation_specification = {
-    #     capacity_reservation_target = {
-    #       capacity_reservation_id = "cr-03d3df2e13babf2ae" 
-    #     }
-    #   }
-    #   ebs_optimized     = true
-    #   enable_monitoring = true
-
-    #   block_device_mappings = {
-    #     xvda = {
-    #       device_name = "/dev/xvda"
-    #       ebs = {
-    #         volume_size           = 1024
-    #         volume_type           = "gp3"
-    #         iops                  = 3000
-    #         throughput            = 150
-    #         encrypted             = true
-    #         delete_on_termination = true
-    #       }
-    #     }
-    #   }
-    #   # The P Series can leverage EFA devices, below we attach EFA interfaces to all of the available slots to the instance
-    #   # we assign the host interface device_index=0, and all other interfaces device_index=1
-    #   #   p5.48xlarge has 32 network card indexes so the range should be 31, we'll create net interfaces 0-31
-    #   #   p4 instances have 4 network card indexes so the range should be 4, we'll create Net interfaces 0-3
-    #   network_interfaces = [
-    #     for i in range(32) : {
-    #       associate_public_ip_address = false
-    #       delete_on_termination       = true
-    #       device_index                = i == 0 ? 0 : 1
-    #       network_card_index          = i
-    #       interface_type              = "efa"
-    #     }
-    #   ]
-    #   # add `--local-disks raid0` to use the NVMe devices underneath the Pods, kubelet, containerd, and logs: https://github.com/awslabs/amazon-eks-ami/pull/1171
-    #   bootstrap_extra_args = "--local-disks raid0"
-    #   taints = {
-    #     gpu = {
-    #       key      = "nvidia.com/gpu"
-    #       effect   = "NO_SCHEDULE"
-    #       operator = "EXISTS"
-    #     }
-    #   }      
-    # }
   }
 
   tags = merge(local.tags, {
@@ -206,19 +152,68 @@ module "eks_blueprints_addons" {
     ]
   }
 
-  enable_karpenter = true
+  # enable_karpenter = true
 
-  karpenter = {
-    repository_username = data.aws_ecrpublic_authorization_token.token.user_name
-    repository_password = data.aws_ecrpublic_authorization_token.token.password
-  }
-  karpenter_enable_spot_termination          = true
-  karpenter_enable_instance_profile_creation = true
-  karpenter_node = {
-    iam_role_use_name_prefix = false
+  # karpenter = {
+  #   repository_username = data.aws_ecrpublic_authorization_token.token.user_name
+  #   repository_password = data.aws_ecrpublic_authorization_token.token.password
+  # }
+  # karpenter_enable_spot_termination          = true
+  # karpenter_enable_instance_profile_creation = true
+  # karpenter_node = {
+  #   iam_role_use_name_prefix = false
+  # }
+
+  tags = local.tags
+}
+
+################################################################################
+# Karpenter
+################################################################################
+
+module "karpenter" {
+  source = "terraform-aws-modules/eks/aws//modules/karpenter"
+
+  cluster_name = module.eks.cluster_name
+
+  enable_v1_permissions = true
+
+  enable_pod_identity             = true
+  create_pod_identity_association = true
+
+  # Used to attach additional IAM policies to the Karpenter node IAM role
+  node_iam_role_additional_policies = {
+    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   }
 
   tags = local.tags
+}
+
+################################################################################
+# Karpenter Helm chart & manifests
+# Not required; just to demonstrate functionality of the sub-module
+################################################################################
+
+resource "helm_release" "karpenter" {
+  namespace           = "kube-system"
+  name                = "karpenter"
+  repository          = "oci://public.ecr.aws/karpenter"
+  repository_username = data.aws_ecrpublic_authorization_token.token.user_name
+  repository_password = data.aws_ecrpublic_authorization_token.token.password
+  chart               = "karpenter"
+  version             = "1.0.6"
+  wait                = false
+
+  values = [
+    <<-EOT
+    serviceAccount:
+      name: ${module.karpenter.service_account}
+    settings:
+      clusterName: ${module.eks.cluster_name}
+      clusterEndpoint: ${module.eks.cluster_endpoint}
+      interruptionQueue: ${module.karpenter.queue_name}
+    EOT
+  ]
 }
 
 module "ebs_csi_driver_irsa" {

@@ -1,1 +1,1 @@
-aws eks update-kubeconfig --region ap-northeast-1 --name awsome-fmops
+aws eks update-kubeconfig --region us-west-2 --name awsome-fmops
