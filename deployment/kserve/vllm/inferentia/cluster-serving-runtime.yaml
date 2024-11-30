@@ -1,0 +1,81 @@
+apiVersion: serving.kserve.io/v1alpha1
+kind: ClusterServingRuntime
+metadata:
+  name: kserve-vllm-neuron
+spec:
+  annotations:
+    prometheus.kserve.io/port: '8080'
+    prometheus.kserve.io/path: "/metrics"
+  supportedModelFormats:
+    - name: vllm
+      version: "1"
+      autoSelect: true
+      priority: 1
+  protocolVersions:
+    - v1
+    - v2
+  volumes:
+    # vLLM needs to access the host's shared memory for tensor parallel inference.
+    - name: cache-volume
+      emptyDir:
+        medium: Memory
+        sizeLimit: "2Gi"
+    - name: shm
+      emptyDir:
+        medium: Memory
+        sizeLimit: "2Gi"
+  containers:
+    - name: kserve-container
+      image: 483026362307.dkr.ecr.us-west-2.amazonaws.com/awsome-fmops:vllm-neuron
+      command: ["/bin/sh", "-c"]
+      args:
+        - vllm
+        - serve 
+        - meta-llama/Llama-3.2-1B
+        - --device
+        - neuron
+        - --tensor-parallel-size 2
+        - --block-size 8
+        - --max-model-len 4096
+        - --max-num-seqs 32
+      env:
+      - name: HUGGING_FACE_HUB_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: hf-token-secret
+            key: token
+      ports:
+      - containerPort: 8000
+      resources:
+        limits:
+          cpu: "10"
+          memory: 20G
+          aws.amazon.com/neuron: 1
+        requests:
+          cpu: "2"
+          memory: 6G
+          aws.amazon.com/neuron: 1
+      volumeMounts:
+      - mountPath: /root/.cache/huggingface
+        name: cache-volume
+      - name: shm
+        mountPath: /dev/shm
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: 8000
+        initialDelaySeconds: 60
+        periodSeconds: 10
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: 8000
+        initialDelaySeconds: 60
+        periodSeconds: 5        
+      #securityContext:
+      #  allowPrivilegeEscalation: false
+      #  privileged: false
+      #  runAsNonRoot: true
+      #  capabilities:
+      #    drop:
+      #      - ALL
