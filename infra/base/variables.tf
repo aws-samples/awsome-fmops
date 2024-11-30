@@ -4,5 +4,5 @@
 variable "region" {
   description = "Region to deploy the resources"
   type        = string
-  default     = "ap-northeast-1"
+  default     = "us-west-2"
 }

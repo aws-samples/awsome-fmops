@@ -43,7 +43,7 @@ data "aws_availability_zones" "available" {}
 
 locals {
   name            = "awsome-fmops"
-  cluster_version = "1.3"
+  cluster_version = "1.30"
   region          = var.region
   node_group_name = "managed-ondemand"
 
@@ -63,7 +63,7 @@ locals {
 ################################################################################
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.8.3"
+  version = "20.30.1"
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
@@ -323,13 +323,13 @@ resource "aws_ecr_repository" "awsome-fmops" {
 #  yaml_body = file("nodepools/gpu-nodeclass.yaml")
 #}
 #
-#resource "kubectl_manifest" "neuron-default-nodepool" {
-#  yaml_body = file("nodepools/neuron-nodepool.yaml")
-#}
-#
-#resource "kubectl_manifest" "neuron-default-nodeclass" {
-#  yaml_body = file("nodepools/neuron-nodeclass.yaml")
-#}
+resource "kubectl_manifest" "neuron-default-nodepool" {
+  yaml_body = file("nodepools/neuron-nodepool.yaml")
+}
+
+resource "kubectl_manifest" "neuron-default-nodeclass" {
+  yaml_body = file("nodepools/neuron-nodeclass.yaml")
+}
 
 #resource "helm_release" "kube-prometheus-stack" {
 #  name       = "prometheus"
