@@ -67,22 +67,13 @@ module "eks" {
 
   cluster_name                   = local.name
   cluster_version                = local.cluster_version
-  cluster_endpoint_public_access = true
+  cluster_endpoint_public_access           = true
 
   cluster_addons = {
     kube-proxy = { most_recent = true }
     coredns    = { most_recent = true }
-
-    vpc-cni = {
-      most_recent    = true
-      before_compute = true
-      configuration_values = jsonencode({
-        env = {
-          ENABLE_PREFIX_DELEGATION = "true"
-          WARM_PREFIX_TARGET       = "1"
-        }
-      })
-    }
+    vpc-cni = {}
+    eks-pod-identity-agent = { most_recent = true }
   }
 
   vpc_id     = module.vpc.vpc_id
@@ -96,28 +87,30 @@ module "eks" {
   enable_efa_support                  = true
 
   eks_managed_node_groups = {
-    mg_5 = {
-      node_group_name = "managed-ondemand"
-      instance_types  = ["m4.large", "m5.large", "m5a.large", "m5ad.large", "m5d.large", "t2.large", "t3.large", "t3a.large"]
+    karpenter = {
+      ami_type       = "AL2023_x86_64_STANDARD"
+      instance_types = ["m5.large"]
 
-      create_security_group = false
-
-      subnet_ids   = module.vpc.private_subnets
-      max_size     = 2
-      desired_size = 2
       min_size     = 2
+      max_size     = 3
+      desired_size = 2
 
-      # Launch template configuration
-      create_launch_template = true              # false will use the default launch template
-      launch_template_os     = "amazonlinux2eks" # amazonlinux2eks or bottlerocket
-
-      labels = {
-        intent = "control-apps"
-      }
+      #taints = {
+      #  # This Taint aims to keep just EKS Addons and Karpenter running on this MNG
+      #  # The pods that do not tolerate this taint should run on nodes created by Karpenter
+      #  addons = {
+      #    key    = "CriticalAddonsOnly"
+      #    value  = "true"
+      #    effect = "NO_SCHEDULE"
+      #  },
+      #}
     }
   }
 
-  tags = merge(local.tags, {
+  node_security_group_tags = merge(local.tags, {
+    # NOTE - if creating multiple security groups with this module, only tag the
+    # security group that Karpenter should utilize with the following tag
+    # (i.e. - at most, only one security group should have this tag in your account)
     "karpenter.sh/discovery" = local.name
   })
 }
@@ -177,6 +170,8 @@ module "karpenter" {
   cluster_name = module.eks.cluster_name
 
   enable_v1_permissions = true
+  #  https://registry.terraform.io/modules/terraform-aws-modules/eks/aws/latest/submodules/karpenter 
+  node_iam_role_arn = module.eks.eks_managed_node_groups["karpenter"].iam_role_arn
 
   enable_pod_identity             = true
   create_pod_identity_association = true
@@ -255,7 +250,7 @@ module "aws-auth" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.6.0"
+  version = "~> 5.0"
 
   name = local.name
   cidr = local.vpc_cidr
